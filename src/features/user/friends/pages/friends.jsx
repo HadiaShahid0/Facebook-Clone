@@ -39,7 +39,7 @@ const Friends = () => {
     const blockedUserIds = await getBlockedUserIdsService(userId);
 
     return allUsers.filter(
-      (user) => !blockedUserIds.includes(user.id) && !user.isAdmin,
+      (user) => !blockedUserIds.includes(user.id) && !user.isAdmin && !user.isSuspended,
     );
   };
   

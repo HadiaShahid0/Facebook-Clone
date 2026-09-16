@@ -195,7 +195,8 @@ export const getAllUsersService = async (currentUserId) => {
       id,
       username,
       profileImage,
-      isAdmin
+      isAdmin,
+      isSuspended
     `,
     )
     .neq("id", currentUserId)

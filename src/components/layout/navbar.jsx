@@ -61,7 +61,7 @@ const Navbar = () => {
 
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, username, profileImage,isAdmin")
+          .select("id, username, profileImage,isAdmin,isSuspended")
           .ilike("username", `%${search}%`)
           .neq("id", userId)
           .limit(10);
@@ -72,7 +72,7 @@ const Navbar = () => {
         }
 
         const visibleUsers = (data || []).filter(
-          (user) => !blockedUserIds.includes(user.id) && !user.isAdmin,
+          (user) => !blockedUserIds.includes(user.id) && !user.isAdmin && !user.isSuspended,
         );
 
         setUsers(visibleUsers.slice(0, 5));
