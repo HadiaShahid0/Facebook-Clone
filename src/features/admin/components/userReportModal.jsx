@@ -5,7 +5,6 @@ import {
   dismissReportsService,
   temporarySuspendUserService,
   permanentSuspendUserService,
-  restoreUserService,
 } from "../services/adminServices";
 
 const UserReportModal = ({ user, onClose, onAction }) => {
@@ -19,9 +18,11 @@ const UserReportModal = ({ user, onClose, onAction }) => {
   }
 
   const reportedUser = user.reportedUser;
-  const latestReport = user.reports[0];
 
-  const isHandled = latestReport?.status !== "pending";
+  const hasPendingReport = user.reports.some(
+    (report) => report.status === "pending",
+  );
+
   const handleAction = async () => {
     if (!action) {
       return;
@@ -37,7 +38,11 @@ const UserReportModal = ({ user, onClose, onAction }) => {
       if (action === "temporary") {
         const date = new Date();
 
-        date.setDate(date.getDate() + Number(days));
+        if (days === "1min") {
+          date.setMinutes(date.getMinutes() + 1);
+        } else {
+          date.setDate(date.getDate() + Number(days));
+        }
 
         await temporarySuspendUserService(
           reportedUser.id,
@@ -48,10 +53,6 @@ const UserReportModal = ({ user, onClose, onAction }) => {
 
       if (action === "permanent") {
         await permanentSuspendUserService(reportedUser.id, reason);
-      }
-
-      if (action === "restore") {
-        await restoreUserService(reportedUser.id, reason);
       }
 
       onAction();
@@ -73,6 +74,7 @@ const UserReportModal = ({ user, onClose, onAction }) => {
     >
       <div className="modal-dialog modal-lg modal-dialog-scrollable">
         <div className="modal-content border-0 rounded-4">
+
           {/* Header */}
           <div className="modal-header">
             <div>
@@ -80,10 +82,15 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                 Reports for {reportedUser?.username}
               </h5>
 
-              <small className="text-muted">Total Reports: {user.count}</small>
+              <small className="text-muted">
+                Total Reports: {user.count}
+              </small>
             </div>
 
-            <button className="btn btn-light rounded-circle" onClick={onClose}>
+            <button
+              className="btn btn-light rounded-circle"
+              onClick={onClose}
+            >
               <X size={18} />
             </button>
           </div>
@@ -107,7 +114,9 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                     />
 
                     <div>
-                      <small className="text-muted d-block">Reported by</small>
+                      <small className="text-muted d-block">
+                        Reported by
+                      </small>
 
                       <span className="fw-semibold">
                         {report.reporter?.username || "Unknown"}
@@ -115,24 +124,36 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                     </div>
                   </div>
 
-                  <small className="text-muted">Report #{index + 1}</small>
+                  <small className="text-muted">
+                    Report #{index + 1}
+                  </small>
                 </div>
 
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <small className="text-muted d-block">Category</small>
+                    <small className="text-muted d-block">
+                      Category
+                    </small>
 
-                    <span className="fw-semibold">{report.category}</span>
+                    <span className="fw-semibold">
+                      {report.category}
+                    </span>
                   </div>
 
                   <div className="col-md-6">
-                    <small className="text-muted d-block">Reason</small>
+                    <small className="text-muted d-block">
+                      Reason
+                    </small>
 
-                    <span className="fw-semibold">{report.reason}</span>
+                    <span className="fw-semibold">
+                      {report.reason}
+                    </span>
                   </div>
 
                   <div className="col-12">
-                    <small className="text-muted d-block">Description</small>
+                    <small className="text-muted d-block">
+                      Description
+                    </small>
 
                     <p className="mb-0">
                       {report.description || "No description provided."}
@@ -141,7 +162,8 @@ const UserReportModal = ({ user, onClose, onAction }) => {
 
                   <div className="col-12">
                     <small className="text-muted">
-                      Reported on {new Date(report.created_at).toLocaleString()}
+                      Reported on{" "}
+                      {new Date(report.created_at).toLocaleString()}
                     </small>
                   </div>
                 </div>
@@ -149,13 +171,15 @@ const UserReportModal = ({ user, onClose, onAction }) => {
             ))}
 
             {/* Moderation */}
-            {/* Moderation */}
             <div className="border-top pt-4 mt-4">
-              <h6 className="fw-bold mb-3">Moderation Action</h6>
+              <h6 className="fw-bold mb-3">
+                Moderation Action
+              </h6>
 
-              {isHandled ? (
+              {!hasPendingReport ? (
                 <div className="alert alert-light border mb-0">
                   <strong>Report handled</strong>
+
                   <div className="text-muted small mt-1">
                     This report has already been handled and cannot be changed.
                   </div>
@@ -163,37 +187,45 @@ const UserReportModal = ({ user, onClose, onAction }) => {
               ) : (
                 <>
                   <div className="mb-3">
-                    <label className="form-label">Action</label>
+                    <label className="form-label">
+                      Action
+                    </label>
 
                     <select
                       className="form-select"
                       value={action}
                       onChange={(e) => setAction(e.target.value)}
                     >
-                      <option value="">Select action</option>
+                      <option value="">
+                        Select action
+                      </option>
 
-                      <option value="dismiss">Dismiss Reports</option>
+                      <option value="dismiss">
+                        Dismiss Reports
+                      </option>
 
-                      <option value="temporary">Temporary Suspend</option>
+                      <option value="temporary">
+                        Temporary Suspend
+                      </option>
 
-                      <option value="permanent">Permanent Suspend</option>
-
-                      {reportedUser?.isSuspended && (
-                        <option value="restore">Restore Account</option>
-                      )}
+                      <option value="permanent">
+                        Permanent Suspend
+                      </option>
                     </select>
                   </div>
 
-                  {/* Temporary duration */}
                   {action === "temporary" && (
                     <div className="mb-3">
-                      <label className="form-label">Suspension Duration</label>
+                      <label className="form-label">
+                        Suspension Duration
+                      </label>
 
                       <select
                         className="form-select"
                         value={days}
                         onChange={(e) => setDays(e.target.value)}
                       >
+                        <option value="1min">1 Minute</option>
                         <option value="1">1 Day</option>
                         <option value="3">3 Days</option>
                         <option value="7">7 Days</option>
@@ -202,10 +234,11 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                     </div>
                   )}
 
-                  {/* Reason */}
                   {action && (
                     <div className="mb-3">
-                      <label className="form-label">Admin Reason</label>
+                      <label className="form-label">
+                        Admin Reason
+                      </label>
 
                       <textarea
                         className="form-control"
@@ -222,7 +255,6 @@ const UserReportModal = ({ user, onClose, onAction }) => {
           </div>
 
           {/* Footer */}
-          {/* Footer */}
           <div className="modal-footer">
             <button
               className="btn btn-secondary"
@@ -232,14 +264,12 @@ const UserReportModal = ({ user, onClose, onAction }) => {
               Close
             </button>
 
-            {!isHandled && action && (
+            {hasPendingReport && action && (
               <button
                 className={`btn ${
-                  action === "restore"
-                    ? "btn-success"
-                    : action === "dismiss"
-                      ? "btn-warning"
-                      : "btn-danger"
+                  action === "dismiss"
+                    ? "btn-warning"
+                    : "btn-danger"
                 }`}
                 onClick={handleAction}
                 disabled={loading}
@@ -250,12 +280,11 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                     ? "Dismiss Reports"
                     : action === "temporary"
                       ? "Temporary Suspend"
-                      : action === "permanent"
-                        ? "Permanent Suspend"
-                        : "Restore Account"}
+                      : "Permanent Suspend"}
               </button>
             )}
           </div>
+
         </div>
       </div>
     </div>

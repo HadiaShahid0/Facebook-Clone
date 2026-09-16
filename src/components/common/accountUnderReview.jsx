@@ -1,39 +1,175 @@
 import { useEffect, useState } from "react";
 import { Shield, AlertCircle } from "react-feather";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import { supabase } from "../../utils/supabase";
+import { getCurrentUserService } from "../../features/auth/services/authServices";
 
 const AccountUnderReview = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const { suspensionType, suspensionReason, suspendedUntil } =
-    location.state || {};
-
+  const [suspension, setSuspension] = useState(location.state || {});
   const [timeLeft, setTimeLeft] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const {
+    suspensionType,
+    suspensionReason,
+    suspendedUntil,
+  } = suspension;
 
   const isTemporary = suspensionType === "temporary";
   const isPermanent = suspensionType === "permanent";
 
+  // Get current profile and listen for realtime changes
   useEffect(() => {
-    if (!isTemporary || !suspendedUntil) {
-      return;
-    }
+    let channel;
 
-    const updateTimer = () => {
-      const difference =
-        new Date(suspendedUntil).getTime() - new Date().getTime();
+    const loadProfile = async () => {
+      const user = await getCurrentUserService();
 
-      if (difference <= 0) {
-        setTimeLeft("Suspension period has ended.");
+      if (!user) {
+        navigate("/login", { replace: true });
         return;
       }
 
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select(
+          "isSuspended, suspensionType, suspensionReason, suspendedUntil",
+        )
+        .eq("id", user.id)
+        .single();
 
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      if (error) {
+        console.error("Error loading profile:", error);
+        setLoading(false);
+        return;
+      }
 
-      const minutes = Math.floor((difference / (1000 * 60)) % 60);
+      // User is not suspended
+      if (!profile?.isSuspended) {
+        navigate("/", { replace: true });
+        return;
+      }
 
-      const seconds = Math.floor((difference / 1000) % 60);
+      setSuspension({
+        suspensionType: profile.suspensionType,
+        suspensionReason: profile.suspensionReason,
+        suspendedUntil: profile.suspendedUntil,
+      });
+
+      setLoading(false);
+
+      channel = supabase
+        .channel(`account-status-${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "profiles",
+            filter: `id=eq.${user.id}`,
+          },
+          (payload) => {
+            const profile = payload.new;
+
+            console.log("Profile updated:", profile);
+
+            // Account restored
+            if (!profile.isSuspended) {
+              navigate("/", { replace: true });
+              return;
+            }
+
+            // Suspension changed
+            setSuspension({
+              suspensionType: profile.suspensionType,
+              suspensionReason: profile.suspensionReason,
+              suspendedUntil: profile.suspendedUntil,
+            });
+          },
+        )
+        .subscribe((status) => {
+          console.log("Realtime status:", status);
+        });
+    };
+
+    loadProfile();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [navigate]);
+
+  // Temporary suspension timer
+  useEffect(() => {
+    if (!isTemporary || !suspendedUntil) {
+      setTimeLeft("");
+      return;
+    }
+
+    let restoring = false;
+
+    const updateTimer = async () => {
+      const difference =
+        new Date(suspendedUntil).getTime() - Date.now();
+
+      if (difference <= 0) {
+        setTimeLeft("Suspension period has ended.");
+
+        if (restoring) {
+          return;
+        }
+
+        restoring = true;
+
+        const user = await getCurrentUserService();
+
+        if (!user) {
+          return;
+        }
+
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            isSuspended: false,
+            suspensionType: null,
+            suspensionReason: null,
+            suspendedAt: null,
+            suspendedUntil: null,
+          })
+          .eq("id", user.id);
+
+        if (error) {
+          console.error("Error restoring account:", error);
+          restoring = false;
+          return;
+        }
+
+        navigate("/", { replace: true });
+
+        return;
+      }
+
+      const days = Math.floor(
+        difference / (1000 * 60 * 60 * 24),
+      );
+
+      const hours = Math.floor(
+        (difference / (1000 * 60 * 60)) % 24,
+      );
+
+      const minutes = Math.floor(
+        (difference / (1000 * 60)) % 60,
+      );
+
+      const seconds = Math.floor(
+        (difference / 1000) % 60,
+      );
 
       setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
     };
@@ -43,7 +179,15 @@ const AccountUnderReview = () => {
     const timer = setInterval(updateTimer, 1000);
 
     return () => clearInterval(timer);
-  }, [isTemporary, suspendedUntil]);
+  }, [isTemporary, suspendedUntil, navigate]);
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -87,12 +231,17 @@ const AccountUnderReview = () => {
         {/* Timer */}
         {isTemporary && suspendedUntil && (
           <div className="alert alert-warning border rounded-3 mb-3">
-            <div className="fw-semibold mb-2">Time Remaining</div>
+            <div className="fw-semibold mb-2">
+              Time Remaining
+            </div>
 
-            <h4 className="fw-bold mb-2">{timeLeft}</h4>
+            <h4 className="fw-bold mb-2">
+              {timeLeft}
+            </h4>
 
             <small className="text-muted">
-              Suspended until {new Date(suspendedUntil).toLocaleString()}
+              Suspended until{" "}
+              {new Date(suspendedUntil).toLocaleString()}
             </small>
           </div>
         )}
@@ -100,7 +249,9 @@ const AccountUnderReview = () => {
         {/* Admin Reason */}
         {suspensionReason && (
           <div className="alert alert-light border rounded-3 text-start">
-            <small className="text-muted d-block mb-1">Admin Reason</small>
+            <small className="text-muted d-block mb-1">
+              Admin Reason
+            </small>
 
             <span>{suspensionReason}</span>
           </div>

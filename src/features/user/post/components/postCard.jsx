@@ -53,11 +53,17 @@ const PostCard = ({ post, currentUser, onLike, onSave, onComment }) => {
         {post.content && <p className="mb-3">{post.content}</p>}
 
         {post.imageUrl && (
-          <img
-            src={post.imageUrl}
-            alt="Post"
-            className="img-fluid rounded mb-3 w-100"
-          />
+          <div
+            className="w-100 rounded mb-3 bg-light d-flex justify-content-center"
+            style={{ height: "400px", overflow: "hidden" }}
+          >
+            <img
+              src={post.imageUrl}
+              alt="Post"
+              className="w-100 h-100 rounded"
+              style={{ objectFit: "contain" }}
+            />
+          </div>
         )}
 
         <div className="d-flex justify-content-between text-muted small mb-2">

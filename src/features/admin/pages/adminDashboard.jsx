@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Flag, Shield, Users, AlertTriangle } from "react-feather";
 
+import { supabase } from "../../../utils/supabase";
+
 import StatCard from "../components/statCard";
 import ReportTable from "../components/reportTable";
 import UserReportModal from "../components/userReportModal";
@@ -58,6 +60,36 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     loadDashboard();
+
+    const channel = supabase
+      .channel("admin-dashboard")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "userReport",
+        },
+        () => {
+          loadDashboard();
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "profiles",
+        },
+        () => {
+          loadDashboard();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   if (loading) {
@@ -131,7 +163,10 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <ReportTable reports={reports} onView={setSelectedUser} />
+          <ReportTable
+            reports={reports}
+            onView={setSelectedUser}
+          />
         </div>
       </div>
 

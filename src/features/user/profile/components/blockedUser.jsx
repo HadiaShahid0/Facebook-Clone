@@ -61,7 +61,7 @@ const BlockedUser = () => {
         <div className="row justify-content-center">
           <div className="col-md-8 col-lg-6">
             <div className="card shadow-sm border-0">
-              <div className="card-body">sssss
+              <div className="card-body">
                 <h4 className="mb-4">Blocked Users</h4>
 
                 {loading ? (
