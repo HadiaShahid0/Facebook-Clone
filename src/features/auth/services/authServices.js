@@ -55,8 +55,6 @@ export const loginService = async (email, password) => {
 
   // Account is suspended
   if (profile?.isSuspended) {
-    await supabase.auth.signOut();
-
     return {
       ...data,
       isSuspended: true,
@@ -70,6 +68,7 @@ export const loginService = async (email, password) => {
   return {
     ...data,
     isAdmin: profile?.isAdmin || false,
+    isSuspended: false,
   };
 };
 

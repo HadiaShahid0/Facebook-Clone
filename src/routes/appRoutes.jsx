@@ -27,7 +27,6 @@ const App = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/account-under-review" element={<AccountUnderReview />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Home />} />
@@ -42,6 +41,7 @@ const App = () => {
         <Route path="/blocked-users" element={<BlockedUser />} />
       </Route>
 
+      <Route path="/account-under-review" element={<AccountUnderReview />} />
       <Route element={<ProtectedRoute adminOnly />}>
         <Route element={<AdminLayout />}>
           <Route path="/admin" element={<AdminDashboard />} />

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { supabase } from "../../../utils/supabase";
+
 import ReportTable from "../components/reportTable";
 import UserReportModal from "../components/userReportModal";
 
@@ -24,6 +26,25 @@ const ReportedUsers = () => {
 
   useEffect(() => {
     loadUsers();
+
+    const channel = supabase
+      .channel("reported-users")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "userReport",
+        },
+        () => {
+          loadUsers();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   if (loading) {
@@ -51,12 +72,10 @@ const ReportedUsers = () => {
       {/* Table */}
       <div className="card border-0 shadow-sm rounded-4">
         <div className="card-body p-4">
-
           <ReportTable
             reports={users}
             onView={setSelectedUser}
           />
-
         </div>
       </div>
 
