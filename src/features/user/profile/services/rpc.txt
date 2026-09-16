@@ -1,0 +1,28 @@
+
+declare  
+  report_count integer;  //variable declaration
+begin //actual code begin
+
+  -- Count unique users who reported this user
+  select count(distinct "reporterId")
+  into report_count
+  from public."userReport"
+  where "reportedUserId" = reported_user_id;
+
+  -- Suspend the user after 2 different reports
+  if report_count >= 2 then
+
+    update public.profiles
+    set
+      "isSuspended" = true,
+      "suspensionType" = 'review',
+      "suspensionReason" = 'Multiple community reports',
+      "suspendedAt" = now()
+    where id = reported_user_id;
+
+    return true;
+  end if;
+
+  return false;
+
+end;
