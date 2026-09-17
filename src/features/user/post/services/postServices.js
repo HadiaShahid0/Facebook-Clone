@@ -10,6 +10,7 @@ const addPostEngagementData = async (posts, currentUserId) => {
 
   const postIds = posts.map((post) => post.id);
 
+  // Get likes
   const { data: likes, error: likesError } = await supabase
     .from("like")
     .select("postId, userId")
@@ -19,6 +20,7 @@ const addPostEngagementData = async (posts, currentUserId) => {
     throw likesError;
   }
 
+  // Get comments
   const { data: comments, error: commentsError } = await supabase
     .from("comment")
     .select("postId")
@@ -26,6 +28,17 @@ const addPostEngagementData = async (posts, currentUserId) => {
 
   if (commentsError) {
     throw commentsError;
+  }
+
+  // Get saved posts
+  const { data: savedPosts, error: savedError } = await supabase
+    .from("savedPost")
+    .select("postId")
+    .eq("userId", currentUserId)
+    .in("postId", postIds);
+
+  if (savedError) {
+    throw savedError;
   }
 
   const likeCounts = {};
@@ -48,11 +61,14 @@ const addPostEngagementData = async (posts, currentUserId) => {
       : [],
   );
 
+  const savedPostIds = new Set(savedPosts.map((savedPost) => savedPost.postId));
+
   return posts.map((post) => ({
     ...post,
     likeCount: likeCounts[post.id] || 0,
     commentCount: commentCounts[post.id] || 0,
     likedByMe: likedPostIds.has(post.id),
+    savedByMe: savedPostIds.has(post.id),
   }));
 };
 
@@ -80,10 +96,12 @@ export const getPostsService = async (userId, from = 0, to = 9) => {
     throw error;
   }
 
-  return data.filter(
+  const visiblePosts = data.filter(
     (post) =>
       !blockedUserIds.includes(post.userId) && !post.profiles?.isSuspended,
   );
+
+  return addPostEngagementData(visiblePosts, userId);
 };
 
 export const getSinglePostService = async (postId, userId) => {
@@ -106,8 +124,8 @@ export const getSinglePostService = async (postId, userId) => {
   if (error) {
     throw error;
   }
-  if(post.profiles?.isSuspended) return null;
-  
+  if (post.profiles?.isSuspended) return null;
+
   const posts = await addPostEngagementData([post], userId);
 
   return posts[0];
@@ -198,7 +216,6 @@ export const uploadPostImageService = async (userId, file) => {
   return data.publicUrl;
 };
 
-
 //LIKE SERVICES
 export const likePostService = async (postId, userId) => {
   const { data: post, error: postError } = await supabase
@@ -239,7 +256,6 @@ export const unlikePostService = async (postId, userId) => {
 
   if (error) throw error;
 };
-
 
 //COMMENT SERVICES
 export const getCommentsService = async (postId, currentUserId) => {
@@ -424,7 +440,6 @@ export const getUserPostsService = async (profileUserId, currentUserId) => {
   return addPostEngagementData(visiblePosts, currentUserId);
 };
 
-
 //SAVE POST SERVICES
 export const savePostService = async (postId, userId) => {
   const { data, error } = await supabase
@@ -466,7 +481,7 @@ export const getSavedPostsService = async (userId) => {
           id,
           username,
           profileImage,
-          isSuspended,
+          isSuspended
         )
       )
     `,
@@ -478,12 +493,23 @@ export const getSavedPostsService = async (userId) => {
     throw error;
   }
 
-  const posts = data.map((item) => item.post).filter((post)=> post && !post.profiles?.isSuspended);
+  const posts = data
+    .map((item) => item.post)
+    .filter((post) => post && !post.profiles?.isSuspended);
 
   const postsWithEngagement = await addPostEngagementData(posts, userId);
 
-  return postsWithEngagement.map((post) => ({
-    ...post,
-    savedByMe: true,
-  }));
+  const postsWithComments = await Promise.all(
+    postsWithEngagement.map(async (post) => {
+      const comments = await getCommentsService(post.id, userId);
+
+      return {
+        ...post,
+        comments,
+        savedByMe: true,
+      };
+    }),
+  );
+
+  return postsWithComments;
 };

@@ -27,7 +27,7 @@ const SavedPosts = () => {
 
         setPosts(savedPosts);
       } catch (error) {
-        console.error("Error loading savSed posts:", error);
+        console.error("Error loading saved posts:", error);
       } finally {
         setLoading(false);
       }
@@ -53,7 +53,6 @@ const SavedPosts = () => {
         }}
       >
         <div className="row">
-          {/* Left Sidebar */}
           <div className="col-lg-3 d-none d-lg-block">
             <div
               className="position-sticky"
@@ -66,7 +65,6 @@ const SavedPosts = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="col-12 col-lg-6 py-4">
             <div
               className="mx-auto"
@@ -74,7 +72,6 @@ const SavedPosts = () => {
                 maxWidth: "650px",
               }}
             >
-              {/* Header */}
               <div className="d-flex align-items-center">
                 <div
                   className="d-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary me-3"
@@ -90,7 +87,6 @@ const SavedPosts = () => {
                 <div></div>
               </div>
 
-              {/* Loading */}
               {loading && (
                 <div className="card border-0 shadow-sm rounded-4">
                   <div className="card-body text-center p-5">
@@ -104,7 +100,6 @@ const SavedPosts = () => {
                 </div>
               )}
 
-              {/* Empty State */}
               {!loading && posts.length === 0 && (
                 <div className="card border-0 shadow-sm rounded-4">
                   <div className="card-body text-center p-5">
@@ -127,7 +122,6 @@ const SavedPosts = () => {
                 </div>
               )}
 
-              {/* Saved Posts */}
               {!loading &&
                 posts.map((post) => (
                   <PostCard
@@ -140,7 +134,6 @@ const SavedPosts = () => {
             </div>
           </div>
 
-          {/* Right Sidebar */}
           <div className="col-lg-3 d-none d-lg-block">
             <div
               className="position-sticky"

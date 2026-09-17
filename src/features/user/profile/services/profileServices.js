@@ -1,6 +1,7 @@
 import { supabase } from "../../../../utils/supabase";
-import {getCurrentAdminService} from "../../../admin/services/adminServices"
-import {createNotificationService} from "../../notification/services/notificationServices"
+import { getCurrentAdminService } from "../../../admin/services/adminServices";
+import { createNotificationService } from "../../notification/services/notificationServices";
+
 //PROFILE SERVICES
 export const getProfileService = async (userId) => {
   const { data, error } = await supabase
@@ -69,7 +70,6 @@ export const uploadProfileImageService = async (userId, file) => {
   const { data } = supabase.storage.from("profileImage").getPublicUrl(filePath);
   return data.publicUrl;
 };
-
 
 //BLOCK SERVICES
 export const blockUserService = async (userId, blockedUserId) => {
@@ -145,7 +145,6 @@ export const getBlockedUsersService = async (userId) => {
 
 
 //REPORT SERVICES
-
 export const reportUserService = async ({
   reporterId,
   reportedUserId,
@@ -153,16 +152,13 @@ export const reportUserService = async ({
   reason,
   description,
 }) => {
-  // Create report
-  const { error: reportError } = await supabase
-    .from("userReport")
-    .insert({
-      reporterId,
-      reportedUserId,
-      category,
-      reason,
-      description: description || null,
-    });
+  const { error: reportError } = await supabase.from("userReport").insert({
+    reporterId,
+    reportedUserId,
+    category,
+    reason,
+    description: description || null,
+  });
 
   if (reportError) {
     // 23505 = duplicate key value
@@ -173,7 +169,6 @@ export const reportUserService = async ({
     throw reportError;
   }
 
-  // Get admin
   const { data: admin, error: adminError } = await supabase
     .from("profiles")
     .select("id")
@@ -185,20 +180,15 @@ export const reportUserService = async ({
     throw adminError;
   }
 
-  // Create notification for admin
   await createNotificationService({
     userId: admin.id,
     senderId: reporterId,
     type: "userReport",
   });
 
-  // Check if the reported user should be suspended
-  const { error: suspendError } = await supabase.rpc(
-    "check_and_suspend_user",
-    {
-      reported_user_id: reportedUserId,
-    },
-  );
+  const { error: suspendError } = await supabase.rpc("check_and_suspend_user", {
+    reported_user_id: reportedUserId,
+  });
 
   if (suspendError) {
     throw suspendError;

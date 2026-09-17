@@ -22,7 +22,6 @@ const AccountUnderReview = () => {
   const isTemporary = suspensionType === "temporary";
   const isPermanent = suspensionType === "permanent";
 
-  // Get current profile and listen for realtime changes
   useEffect(() => {
     let channel;
 
@@ -48,7 +47,6 @@ const AccountUnderReview = () => {
         return;
       }
 
-      // User is not suspended
       if (!profile?.isSuspended) {
         navigate("/", { replace: true });
         return;

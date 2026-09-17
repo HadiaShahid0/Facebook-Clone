@@ -96,7 +96,6 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
   return (
     <>
       <div className="d-flex">
-        {/* Like */}
         <button
           type="button"
           className={`btn flex-grow-1 ${
@@ -113,7 +112,6 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
           Like
         </button>
 
-        {/* Comment */}
         <button
           type="button"
           className="btn text-secondary flex-grow-1"
@@ -123,7 +121,6 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
           Comment
         </button>
 
-        {/* Share */}
         <button
           type="button"
           className="btn text-secondary flex-grow-1"
@@ -133,7 +130,6 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
           Share
         </button>
 
-        {/* Save */}
         <button
           type="button"
           className={`btn flex-grow-1 ${
@@ -151,7 +147,6 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
         </button>
       </div>
 
-      {/* Toast */}
       {toast && (
         <div
           className="toast show position-fixed bottom-0 end-0 m-3 border-0 shadow-sm"

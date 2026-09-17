@@ -1,5 +1,6 @@
 import { supabase } from "../../../utils/supabase";
 
+//GET SERVICES
 export const getTotalUsersService = async () => {
   const { count, error } = await supabase
     .from("profiles")
@@ -177,6 +178,7 @@ export const updateReportStatusService = async (userId, status) => {
   }
 };
 
+//REPORT SERVICES
 export const dismissReportsService = async (userId, reason) => {
   const admin = await getCurrentAdminService();
 
@@ -210,7 +212,6 @@ export const dismissReportsService = async (userId, reason) => {
     throw actionError;
   }
 };
-
 
 export const temporarySuspendUserService = async (
   userId,
@@ -281,39 +282,6 @@ export const permanentSuspendUserService = async (userId, reason) => {
     throw actionError;
   }
 };
-
-// // export const restoreUserService = async (userId, reason) => {
-//   const admin = await getCurrentAdminService();
-
-//   const { error: profileError } = await supabase
-//     .from("profiles")
-//     .update({
-//       isSuspended: false,
-//       suspensionType: null,
-//       suspensionReason: null,
-//       suspendedAt: null,
-//       suspendedUntil: null,
-//     })
-//     .eq("id", userId);
-
-//   if (profileError) {
-//     throw profileError;
-//   }
-//   await updateReportStatusService(userId, "reviewed");
-
-//   const { error: actionError } = await supabase
-//     .from("moderationAction")
-//     .insert({
-//       userId,
-//       adminId: admin.id,
-//       action: "restore_account",
-//       reason,
-//     });
-
-//   if (actionError) {
-//     throw actionError;
-//   }
-// // };
 
 export const getAllUsersService = async () => {
   const { data, error } = await supabase
