@@ -56,22 +56,21 @@ const ReportedUsers = () => {
   }
 
   return (
-    <div className="p-4">
-
+    <div className="p-2 p-sm-3 p-md-4">
       {/* Header */}
-      <div className="mb-4">
-        <h3 className="fw-bold mb-1">
+      <div className="mb-3 mb-md-4">
+        <h3 className="fw-bold mb-1 fs-4 fs-md-3">
           Reported Users
         </h3>
 
-        <p className="text-muted mb-0">
+        <p className="text-muted mb-0 small">
           Review users reported by the community.
         </p>
       </div>
 
       {/* Table */}
       <div className="card border-0 shadow-sm rounded-4">
-        <div className="card-body p-4">
+        <div className="card-body p-2 p-sm-3 p-md-4">
           <ReportTable
             reports={users}
             onView={setSelectedUser}
@@ -84,7 +83,6 @@ const ReportedUsers = () => {
         user={selectedUser}
         onClose={() => setSelectedUser(null)}
       />
-
     </div>
   );
 };

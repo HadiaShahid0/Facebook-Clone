@@ -22,6 +22,7 @@ import UserReports from "../features/admin/pages/userReports";
 import SuspendedUsers from "../features/admin/pages/suspendedUsers";
 // import AdminUsers from "../features/admin/pages/adminUsers";
 // import AdminSettings from "../features/admin/pages/adminSetting";
+import AdminNotifications from "../features/admin/pages/notification";
 const App = () => {
   return (
     <Routes>
@@ -49,10 +50,10 @@ const App = () => {
           <Route path="/admin/reported-users" element={<ReportedUsers />} />
 
           <Route path="/admin/user-reports/:userId" element={<UserReports />} />
-          <Route path="/admin/suspended-users" element={<SuspendedUsers/>}/>
+          <Route path="/admin/suspended-users" element={<SuspendedUsers />} />
           {/* <Route path="/admin/users" element={<AdminUsers/>}/> */}
           {/* <Route path="/admin/settings" element={<AdminSettings/>}/> */}
-
+          <Route path="/admin/notifications" element={<AdminNotifications />} />
         </Route>
       </Route>
     </Routes>

@@ -42,14 +42,10 @@ const Notifications = () => {
         setNotifications(data);
         setLoading(false);
 
-        channel = subscribeToNotificationChanges(async (payload) => {
+        channel = subscribeToNotificationChanges(user.id, async (payload) => {
           const newNotification = payload.new;
 
           console.log("Realtime notification:", newNotification);
-
-          if (newNotification.userId !== user.id) {
-            return;
-          }
 
           try {
             const notification = await getNotificationByIdService(

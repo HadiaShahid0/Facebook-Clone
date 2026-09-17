@@ -13,10 +13,10 @@ const ReportTable = ({ reports, onView }) => {
         <thead>
           <tr className="text-muted">
             <th>User</th>
-            <th>Total Reports</th>
+            <th className="text-nowrap">Total Reports</th>
             <th>Latest Reason</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th className="text-nowrap">Status</th>
+            <th className="text-nowrap">Action</th>
           </tr>
         </thead>
 
@@ -28,38 +28,25 @@ const ReportTable = ({ reports, onView }) => {
             let status = "Pending";
             let statusClass = "bg-warning text-dark";
 
-            // Report dismissed
             if (latestReport?.status === "dismissed") {
               status = "Dismissed";
               statusClass = "bg-secondary";
-            }
-
-            // Report reviewed
-            else if (latestReport?.status === "reviewed") {
+            } else if (latestReport?.status === "reviewed") {
               status = "Reviewed";
               statusClass = "bg-success";
-            }
-
-            // User temporarily suspended
-            else if (
+            } else if (
               user?.isSuspended &&
               user?.suspensionType === "temporary"
             ) {
               status = "Temporary Suspended";
               statusClass = "bg-danger";
-            }
-
-            // User permanently suspended
-            else if (
+            } else if (
               user?.isSuspended &&
               user?.suspensionType === "permanent"
             ) {
               status = "Permanent Suspended";
               statusClass = "bg-danger";
-            }
-
-            // Some moderation action was taken
-            else if (latestReport?.status === "action_taken") {
+            } else if (latestReport?.status === "action_taken") {
               status = "Action Taken";
               statusClass = "bg-danger";
             }
@@ -75,19 +62,19 @@ const ReportTable = ({ reports, onView }) => {
                         `https://ui-avatars.com/api/?name=${user?.username}`
                       }
                       alt=""
-                      className="rounded-circle"
+                      className="rounded-circle flex-shrink-0"
                       width="40"
                       height="40"
                     />
 
-                    <span className="fw-semibold">
+                    <span className="fw-semibold text-nowrap">
                       {user?.username || "Unknown"}
                     </span>
                   </div>
                 </td>
 
                 {/* Count */}
-                <td>
+                <td className="text-nowrap">
                   <span className="badge bg-danger">
                     {item.count}{" "}
                     {item.count === 1 ? "Report" : "Reports"}
@@ -96,18 +83,20 @@ const ReportTable = ({ reports, onView }) => {
 
                 {/* Reason */}
                 <td>
-                  {latestReport?.reason || "No reason"}
+                  <span className="text-nowrap">
+                    {latestReport?.reason || "No reason"}
+                  </span>
                 </td>
 
                 {/* Status */}
-                <td>
+                <td className="text-nowrap">
                   <span className={`badge ${statusClass}`}>
                     {status}
                   </span>
                 </td>
 
-                {/* View */}
-                <td>
+                {/* Action */}
+                <td className="text-nowrap">
                   <button
                     className="btn btn-sm btn-outline-primary"
                     onClick={() => onView(item)}

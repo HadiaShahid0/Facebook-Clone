@@ -101,19 +101,21 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-2 p-sm-3 p-md-4">
       {/* Header */}
-      <div className="mb-4">
-        <h3 className="fw-bold mb-1">Dashboard</h3>
+      <div className="mb-3 mb-md-4">
+        <h3 className="fw-bold mb-1 fs-4 fs-md-3">
+          Dashboard
+        </h3>
 
-        <p className="text-muted mb-0">
+        <p className="text-muted mb-0 small">
           Monitor reports and manage your community.
         </p>
       </div>
 
       {/* Stats */}
-      <div className="row g-4 mb-4">
-        <div className="col-md-6 col-xl-3">
+      <div className="row g-3 g-md-4 mb-3 mb-md-4">
+        <div className="col-12 col-sm-6 col-xl-3">
           <StatCard
             title="Total Reports"
             value={stats.totalReports}
@@ -122,7 +124,7 @@ const AdminDashboard = () => {
           />
         </div>
 
-        <div className="col-md-6 col-xl-3">
+        <div className="col-12 col-sm-6 col-xl-3">
           <StatCard
             title="Pending Reports"
             value={stats.pendingReports}
@@ -131,7 +133,7 @@ const AdminDashboard = () => {
           />
         </div>
 
-        <div className="col-md-6 col-xl-3">
+        <div className="col-12 col-sm-6 col-xl-3">
           <StatCard
             title="Suspended Users"
             value={stats.suspendedUsers}
@@ -140,7 +142,7 @@ const AdminDashboard = () => {
           />
         </div>
 
-        <div className="col-md-6 col-xl-3">
+        <div className="col-12 col-sm-6 col-xl-3">
           <StatCard
             title="Total Users"
             value={stats.totalUsers}
@@ -152,21 +154,24 @@ const AdminDashboard = () => {
 
       {/* Recent Reports */}
       <div className="card border-0 shadow-sm rounded-4">
-        <div className="card-body p-4">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h5 className="fw-bold mb-1">Recent Reports</h5>
+        <div className="card-body p-2 p-sm-3 p-md-4">
+          <div className="mb-3 mb-md-4">
+            <h5 className="fw-bold mb-1">
+              Recent Reports
+            </h5>
 
-              <small className="text-muted">
-                Users recently reported by the community
-              </small>
-            </div>
+            <small className="text-muted">
+              Users recently reported by the community
+            </small>
           </div>
 
-          <ReportTable
-            reports={reports}
-            onView={setSelectedUser}
-          />
+          {/* Responsive table */}
+          <div className="table-responsive">
+            <ReportTable
+              reports={reports}
+              onView={setSelectedUser}
+            />
+          </div>
         </div>
       </div>
 
