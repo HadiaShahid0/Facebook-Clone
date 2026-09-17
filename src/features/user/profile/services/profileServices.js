@@ -1,5 +1,6 @@
 import { supabase } from "../../../../utils/supabase";
-
+import {getCurrentAdminService} from "../../../admin/services/adminServices"
+import {createNotificationService} from "../../notification/services/notificationServices"
 //PROFILE SERVICES
 export const getProfileService = async (userId) => {
   const { data, error } = await supabase
@@ -152,16 +153,19 @@ export const reportUserService = async ({
   reason,
   description,
 }) => {
-  const { error: reportError } = await supabase.from("userReport").insert({
-    reporterId,
-    reportedUserId,
-    category,
-    reason,
-    description: description || null,
-  });
+  // Create report
+  const { error: reportError } = await supabase
+    .from("userReport")
+    .insert({
+      reporterId,
+      reportedUserId,
+      category,
+      reason,
+      description: description || null,
+    });
 
   if (reportError) {
-    //23505 is the db duplicate key value error
+    // 23505 = duplicate key value
     if (reportError.code === "23505") {
       throw new Error("You have already reported this user.");
     }
@@ -169,9 +173,32 @@ export const reportUserService = async ({
     throw reportError;
   }
 
-  const { error: suspendError } = await supabase.rpc("check_and_suspend_user", {
-    reported_user_id: reportedUserId,
+  // Get admin
+  const { data: admin, error: adminError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("isAdmin", true)
+    .limit(1)
+    .single();
+
+  if (adminError) {
+    throw adminError;
+  }
+
+  // Create notification for admin
+  await createNotificationService({
+    userId: admin.id,
+    senderId: reporterId,
+    type: "userReport",
   });
+
+  // Check if the reported user should be suspended
+  const { error: suspendError } = await supabase.rpc(
+    "check_and_suspend_user",
+    {
+      reported_user_id: reportedUserId,
+    },
+  );
 
   if (suspendError) {
     throw suspendError;
