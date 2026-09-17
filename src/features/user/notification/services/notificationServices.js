@@ -118,22 +118,3 @@ export const getUnreadNotificationCountService = async (userId) => {
 
   return count || 0;
 };
-<div>
-  <div className="d-flex align-items-center gap-2">
-    <div className="text-primary">
-      <Bell size={25} />
-    </div>
-
-    <h3 className="fw-bold mb-0">Notifications</h3>
-
-    {unreadCount > 0 && (
-      <span className="badge bg-danger rounded-pill">
-        {unreadCount}
-      </span>
-    )}
-  </div>
-
-  <p className="text-muted mb-0 mt-1">
-    Stay updated with activity on your platform.
-  </p>
-</div>
