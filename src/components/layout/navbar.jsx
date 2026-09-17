@@ -189,7 +189,6 @@ const Navbar = () => {
       {/* ================= DESKTOP NAVBAR ================= */}
       <nav className="navbar navbar-light bg-white shadow-sm sticky-top navbar-height d-none d-md-block">
         <div className="container-fluid px-3">
-          {/* Left: Logo + Search */}
           <div className="d-flex align-items-center gap-3">
             <Link
               to="/"

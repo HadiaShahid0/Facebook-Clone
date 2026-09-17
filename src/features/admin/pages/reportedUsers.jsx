@@ -59,9 +59,7 @@ const ReportedUsers = () => {
     <div className="p-2 p-sm-3 p-md-4">
       {/* Header */}
       <div className="mb-3 mb-md-4">
-        <h3 className="fw-bold mb-1 fs-4 fs-md-3">
-          Reported Users
-        </h3>
+        <h3 className="fw-bold mb-1 fs-4 fs-md-3">Reported Users</h3>
 
         <p className="text-muted mb-0 small">
           Review users reported by the community.
@@ -71,10 +69,7 @@ const ReportedUsers = () => {
       {/* Table */}
       <div className="card border-0 shadow-sm rounded-4">
         <div className="card-body p-2 p-sm-3 p-md-4">
-          <ReportTable
-            reports={users}
-            onView={setSelectedUser}
-          />
+          <ReportTable reports={users} onView={setSelectedUser} />
         </div>
       </div>
 

@@ -113,8 +113,6 @@ const AdminNotifications = () => {
   };
 
   const getNotificationData = (notification) => {
-    const username = notification.profiles?.username || "A user";
-
     switch (notification.type) {
       case "userReport":
         return {

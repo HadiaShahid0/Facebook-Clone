@@ -55,34 +55,18 @@ const CommentSection = ({
         return;
       }
 
-      channel = subscribeToPostComments(post.id, async (newComment) => {
+      channel = subscribeToPostComments(post.id, async () => {
         try {
           const commentsData = await getCommentsService(
             post.id,
             currentUser?.id,
           );
 
-          const newCommentWithProfile = commentsData.find(
-            (item) => item.id === newComment.id,
-          );
-
-          if (!newCommentWithProfile) {
-            return;
+          if (isActive) {
+            setComments(commentsData);
           }
-
-          setComments((previousComments) => {
-            const alreadyExists = previousComments.some(
-              (item) => item.id === newCommentWithProfile.id,
-            );
-
-            if (alreadyExists) {
-              return previousComments;
-            }
-
-            return [...previousComments, newCommentWithProfile];
-          });
         } catch (error) {
-          console.error("Error loading realtime comment:", error);
+          console.error("Error loading realtime comments:", error);
         }
       });
     };
@@ -97,7 +81,7 @@ const CommentSection = ({
         channel = null;
       }
     };
-  }, [post?.id]);
+  }, [post?.id, currentUser?.id]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -155,7 +139,7 @@ const CommentSection = ({
             />
           ))}
 
-          {topLevelComments.length > 1 && (
+          {comments.length > 1 && (
             <button
               type="button"
               className="btn btn-sm p-0 text-primary mb-2"

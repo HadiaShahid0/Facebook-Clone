@@ -41,7 +41,6 @@ const SinglePost = () => {
         }}
       >
         <div className="row">
-          {/* Left Sidebar */}
           <div className="col-lg-3 d-none d-lg-block">
             <div
               className="position-sticky"
@@ -54,7 +53,6 @@ const SinglePost = () => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="col-12 col-lg-6 py-4">
             <div className="mx-auto" style={{ maxWidth: "650px" }}>
               <div className="d-flex align-items-center mb-3">
@@ -102,7 +100,6 @@ const SinglePost = () => {
             </div>
           </div>
 
-          {/* Right Sidebar */}
           <div className="col-lg-3 d-none d-lg-block">
             <div
               className="position-sticky"
