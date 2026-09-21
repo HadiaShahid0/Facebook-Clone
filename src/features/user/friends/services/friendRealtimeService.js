@@ -1,6 +1,6 @@
 import { supabase } from "../../../../utils/supabase";
 
-export const subscribeToFriendChanges = (callback) => {
+export const subscribeToFriendChangesServices = (callback) => {
   const channel = supabase
     .channel("friend-realtime")
     .on(

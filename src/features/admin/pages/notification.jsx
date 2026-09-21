@@ -13,7 +13,7 @@ import {
   markNotificationReadService,
 } from "../../user/notification/services/notificationServices";
 
-import { subscribeToNotificationChanges } from "../../user/notification/services/notificationReatimeService";
+import { subscribeToNotificationChangesServices } from "../../user/notification/services/notificationReatimeService";
 
 const AdminNotifications = () => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const AdminNotifications = () => {
         setNotifications(data || []);
         setLoading(false);
 
-        channel = subscribeToNotificationChanges(user.id, async (payload) => {
+        channel = subscribeToNotificationChangesServices(user.id, async (payload) => {
           try {
             const notification = await getNotificationByIdService(
               payload.new.id,

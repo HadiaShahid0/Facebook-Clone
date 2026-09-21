@@ -10,7 +10,7 @@ import AllUsers from "../components/users";
 import SentRequest from "../components/sentRequest";
 
 import { getCurrentUserService } from "../../../auth/services/authServices";
-import { subscribeToFriendChanges } from "../services/friendRealtimeService";
+import { subscribeToFriendChangesServices } from "../services/friendRealtimeService";
 import { getBlockedUserIdsService } from "../../profile/services/profileServices";
 import { supabase } from "../../../../utils/supabase";
 
@@ -39,10 +39,11 @@ const Friends = () => {
     const blockedUserIds = await getBlockedUserIdsService(userId);
 
     return allUsers.filter(
-      (user) => !blockedUserIds.includes(user.id) && !user.isAdmin && !user.isSuspended,
+      (user) =>
+        !blockedUserIds.includes(user.id) && !user.isAdmin && !user.isSuspended,
     );
   };
-  
+
   const loadFriends = async () => {
     try {
       setLoading(true);
@@ -80,142 +81,65 @@ const Friends = () => {
 
   useEffect(() => {
     if (!currentUser) return;
+    const userId = currentUser.id;
+    const refreshUsers = async () => {
+      const users = await getVisibleUsers(userId);
+      setUsers(users);
+    };
 
-    const channel = subscribeToFriendChanges(async (payload) => {
+    const refreshRequests = async (isSender, isReceiver) => {
+      if (isReceiver) {
+        const requests = await getFriendRequestsService(userId);
+        setRequests(requests);
+      }
+      if (isSender) {
+        const sentRequests = await getSentFriendRequestsService(userId);
+        setSentRequests(sentRequests);
+      }
+    };
+
+    const channel = subscribeToFriendChangesServices(async (payload) => {
       try {
-        const newRequest = payload.new;
+        const request = payload.new || payload.old;
+        const isSender = String(request.senderId) === String(userId);
+
+        const isReceiver = String(request.receiverId) === String(userId);
+        if (!isSender && !isReceiver) return;
 
         if (payload.eventType === "INSERT") {
-          const isSender =
-            String(newRequest.senderId) === String(currentUser.id);
-
-          const isReceiver =
-            String(newRequest.receiverId) === String(currentUser.id);
-
-          if (isReceiver && newRequest.status === "pending") {
-            const friendRequests = await getFriendRequestsService(
-              currentUser.id,
-            );
-
-            setRequests(friendRequests);
+          if (request.status === "pending") {
+            await refreshRequests(isSender, isReceiver);
           }
-
-          if (isSender && newRequest.status === "pending") {
-            const sentFriendRequests = await getSentFriendRequestsService(
-              currentUser.id,
-            );
-
-            setSentRequests(sentFriendRequests);
-          }
-
-          if (isSender || isReceiver) {
-            const allUsers = await getVisibleUsers(currentUser.id);
-
-            setUsers(allUsers);
-          }
-
+          await refreshUsers();
           return;
         }
 
         if (payload.eventType === "UPDATE") {
-          const isSender =
-            String(newRequest.senderId) === String(currentUser.id);
-
-          const isReceiver =
-            String(newRequest.receiverId) === String(currentUser.id);
-
-          if (newRequest.status === "pending" && (isSender || isReceiver)) {
-            if (isSender) {
-              const sentFriendRequests = await getSentFriendRequestsService(
-                currentUser.id,
-              );
-
-              setSentRequests(sentFriendRequests);
-            }
-
-            if (isReceiver) {
-              const friendRequests = await getFriendRequestsService(
-                currentUser.id,
-              );
-
-              setRequests(friendRequests);
-            }
-
-            const allUsers = await getVisibleUsers(currentUser.id);
-
-            setUsers(allUsers);
-
+          if (request.status === "pending") {
+            await refreshRequests(isSender, isReceiver);
+            await refreshUsers();
             return;
           }
-
-          if (
-            (newRequest.status === "cancelled" ||
-              newRequest.status === "rejected") &&
-            (isSender || isReceiver)
-          ) {
+          if (request.status === "canceled" || request.status === "rejected") {
             if (isSender) {
-              setSentRequests((previousRequests) =>
-                previousRequests.filter(
-                  (request) => request.id !== newRequest.id,
-                ),
+              setSentRequests((prev) =>
+                prev.filter((item) => item.id !== request.id),
               );
             }
-
             if (isReceiver) {
-              setRequests((previousRequests) =>
-                previousRequests.filter(
-                  (request) => request.id !== newRequest.id,
-                ),
+              setRequests((prev) =>
+                prev.filter((item) => item.id !== request.id),
               );
             }
-
-            const allUsers = await getVisibleUsers(currentUser.id);
-            setUsers(allUsers);
+            await refreshUsers();
             return;
           }
-
-          if (newRequest.status === "accepted" && (isSender || isReceiver)) {
-            const [friendList, friendRequests, sentFriendRequests, allUsers] =
-              await Promise.all([
-                getFriendsService(currentUser.id),
-                getFriendRequestsService(currentUser.id),
-                getSentFriendRequestsService(currentUser.id),
-                getVisibleUsers(currentUser.id),
-              ]);
-
-            setFriends(friendList);
-            setRequests(friendRequests);
-            setSentRequests(sentFriendRequests);
-            setUsers(allUsers);
-
-            return;
+          if (request.status === "accepted") {
+            await loadFriends();
           }
         }
         if (payload.eventType === "DELETE") {
-          const oldRequest = payload.old;
-
-          const isSender =
-            String(oldRequest.senderId) === String(currentUser.id);
-
-          const isReceiver =
-            String(oldRequest.receiverId) === String(currentUser.id);
-
-          if (!isSender && !isReceiver) {
-            return;
-          }
-
-          const [friendList, friendRequests, sentFriendRequests, allUsers] =
-            await Promise.all([
-              getFriendsService(currentUser.id),
-              getFriendRequestsService(currentUser.id),
-              getSentFriendRequestsService(currentUser.id),
-              getVisibleUsers(currentUser.id),
-            ]);
-
-          setFriends(friendList);
-          setRequests(friendRequests);
-          setSentRequests(sentFriendRequests);
-          setUsers(allUsers);
+          await loadFriends();
         }
       } catch (error) {
         console.error("Error handling friend realtime update:", error);
@@ -227,15 +151,17 @@ const Friends = () => {
     };
   }, [currentUser]);
 
+  const removeRequest= (setRequestsList, requestId)=>{
+    setRequestsList((prev)=>prev.filter((reqId)=> reqId.id !==requestId))
+  }
+  
   const handleAccept = async (requestId) => {
     try {
       if (!currentUser) return;
 
       await acceptFriendRequestService(requestId, currentUser.id);
 
-      setRequests((previousRequests) =>
-        previousRequests.filter((request) => request.id !== requestId),
-      );
+      removeRequest(setRequests,requestId)
 
       const friendList = await getFriendsService(currentUser.id);
 
@@ -251,9 +177,7 @@ const Friends = () => {
 
       await deleteFriendRequestService(requestId);
 
-      setRequests((previousRequests) =>
-        previousRequests.filter((request) => request.id !== requestId),
-      );
+      removeRequest(setRequests,requestId)
     } catch (error) {
       console.error("Error deleting friend request:", error);
     }
@@ -265,9 +189,7 @@ const Friends = () => {
 
       await deleteFriendRequestService(requestId);
 
-      setSentRequests((previousRequests) =>
-        previousRequests.filter((request) => request.id !== requestId),
-      );
+      removeRequest(setRequests,requestId)
     } catch (error) {
       console.error("Error cancelling friend request:", error);
     }

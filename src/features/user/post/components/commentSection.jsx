@@ -8,7 +8,7 @@ import {
 
 import { getAvatarUrl } from "../../../../services/profileImageServices";
 import { supabase } from "../../../../utils/supabase";
-import { subscribeToPostComments } from "../services/postRealtimeService";
+import { subscribeToPostCommentsServices } from "../services/postRealtimeService";
 
 import Comment from "./comment";
 
@@ -55,7 +55,7 @@ const CommentSection = ({
         return;
       }
 
-      channel = subscribeToPostComments(post.id, async () => {
+      channel = subscribeToPostCommentsServices(post.id, async () => {
         try {
           const commentsData = await getCommentsService(
             post.id,

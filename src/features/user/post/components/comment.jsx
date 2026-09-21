@@ -28,7 +28,7 @@ const Comment = ({
 
   const visibleReplies = showAllReplies ? replies : replies.slice(0, 2);
 
-  const handleLike = async () => {
+  const handleLikeUnlike = async () => {
     if (!currentUser || liking) {
       return;
     }
@@ -122,7 +122,7 @@ const Comment = ({
                 className={`btn btn-sm p-0 ${
                   liked ? "text-primary" : "text-secondary"
                 }`}
-                onClick={handleLike}
+                onClick={handleLikeUnlike}
                 disabled={liking}
               >
                 <Heart

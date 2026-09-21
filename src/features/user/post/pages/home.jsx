@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Navbar from "../../../../components/layout/navbar";
@@ -16,8 +16,8 @@ import {
 import { getPostsService } from "../services/postServices";
 import { supabase } from "../../../../utils/supabase";
 import {
-  subscribeToPostLikes,
-  subscribeToNewPosts,
+  subscribeToPostLikesServices,
+  subscribeToNewPostsServices,
 } from "../services/postRealtimeService";
 
 const PAGE_SIZE = 10;
@@ -39,7 +39,7 @@ const Home = () => {
   useEffect(() => {
     if (!currentUser) return;
 
-    const channel = subscribeToPostLikes((change) => {
+    const channel = subscribeToPostLikesServices((change) => {
       if (change.userId === currentUser.id) {
         return;
       }
@@ -91,7 +91,7 @@ const Home = () => {
   useEffect(() => {
     if (!currentUser) return;
 
-    const channel = subscribeToNewPosts(async (newPost) => {
+    const channel = subscribeToNewPostsServices(async (newPost) => {
       try {
         const blockedUserIds = await getBlockedUserIdsService(currentUser.id);
 
@@ -238,7 +238,7 @@ const Home = () => {
   };
 
   // Update like
-  const handleLike = (postId, liked) => {
+  const handleLikeUnlike = (postId, liked) => {
     setPosts((previousPosts) =>
       previousPosts.map((post) => {
         if (post.id !== postId) {
@@ -272,10 +272,10 @@ const Home = () => {
     );
   };
 
-  const handleSave = (postId, saved) => {
+  const handleSaveUnsave = (postId, saved) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
-        post.id === postId ? { ...post, savedByMe: saved } : post,
+        post.id === postId ? { ...post, savedByMehandleSaveUnsave: saved } : post,
       ),
     );
   };
@@ -340,9 +340,10 @@ const Home = () => {
                     key={post.id}
                     post={post}
                     currentUser={currentUser}
-                    onLike={handleLike}
+                    onLikeUnlike={handleLikeUnlike}
                     onComment={handleComment}
-                    onSave={handleSave}
+                    onSaveUnsave={handleSaveUnsave}
+
                   />
                 ))
               )}

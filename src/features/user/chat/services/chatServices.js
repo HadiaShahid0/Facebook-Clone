@@ -170,7 +170,7 @@ export const getChatUsersService = async (userId) => {
     .select(
       `
       receiverId,
-      receiver:profiles!messages_receiverid_fkey (
+      receiver:profiles!messages_receiverid_fkey (subscribeToFriendChangesServices"
         id,
         username,
         profileImage

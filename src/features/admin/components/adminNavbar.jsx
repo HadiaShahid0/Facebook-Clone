@@ -6,7 +6,7 @@ import { getCurrentUserService } from "../../auth/services/authServices";
 
 import { getNotificationsService } from "../../user/notification/services/notificationServices";
 
-import { subscribeToNotificationChanges } from "../../user/notification/services/notificationReatimeService";
+import { subscribeToNotificationChangesServices } from "../../user/notification/services/notificationReatimeService";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ const AdminNavbar = () => {
 
         await loadNotifications();
 
-        channel = subscribeToNotificationChanges(user.id, () => {
+        channel = subscribeToNotificationChangesServices(user.id, () => {
           loadNotifications();
         });
       } catch (error) {
