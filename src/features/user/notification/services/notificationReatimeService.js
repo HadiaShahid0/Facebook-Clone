@@ -1,6 +1,6 @@
 import { supabase } from "../../../../utils/supabase";
 
-export const subscribeToNotificationChanges = (
+export const subscribeToNotificationChangesServices = (
   userId,
   callback,
 ) => {

@@ -441,7 +441,7 @@ export const getUserPostsService = async (profileUserId, currentUserId) => {
 };
 
 //SAVE POST SERVICES
-export const savePostService = async (postId, userId) => {
+export const savedPostService = async (postId, userId) => {
   const { data, error } = await supabase
     .from("savedPost")
     .insert({
@@ -458,7 +458,7 @@ export const savePostService = async (postId, userId) => {
   return data;
 };
 
-export const unsavePostService = async (postId, userId) => {
+export const unsavedPostService = async (postId, userId) => {
   const { error } = await supabase
     .from("savedPost")
     .delete()

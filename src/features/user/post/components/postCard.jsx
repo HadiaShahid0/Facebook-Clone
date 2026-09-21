@@ -5,7 +5,7 @@ import PostActions from "./postAction";
 import CommentSection from "./commentSection";
 import { getAvatarUrl } from "../../../../services/profileImageServices";
 
-const PostCard = ({ post, currentUser, onLike, onSave, onComment }) => {
+const PostCard = ({ post, currentUser, onLikeUnlike, onSaveUnsave, onComment }) => {
   const navigate = useNavigate();
   const profile = post?.profiles;
   const [showCommentsModal, setShowCommentsModal] = useState(false);
@@ -76,8 +76,8 @@ const PostCard = ({ post, currentUser, onLike, onSave, onComment }) => {
         <PostActions
           post={post}
           currentUser={currentUser}
-          onLike={onLike}
-          onSave={onSave}
+          onLikeUnlike={onLikeUnlike}
+          onSaveUnsave={onSaveUnsave}
           onCommentClick={() => setShowCommentsModal(true)}
         />
 

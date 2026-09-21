@@ -5,7 +5,6 @@ import { getUserPostsService } from "../../post/services/postServices";
 const ProfilePosts = ({ userId, currentUser }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const loadPosts = async () => {
     try {
       setLoading(true);
@@ -26,9 +25,9 @@ const ProfilePosts = ({ userId, currentUser }) => {
     }
   }, [userId, currentUser?.id]);
 
-  const handleLike = (postId, liked) => {
-    setPosts((previousPosts) =>
-      previousPosts.map((post) =>
+  const handleLikeUnlike = (postId, liked) => {
+    setPosts((prev) =>
+      prev.map((post) =>
         post.id === postId
           ? {
               ...post,
@@ -38,6 +37,13 @@ const ProfilePosts = ({ userId, currentUser }) => {
                 : Math.max(0, (post.likeCount || 0) - 1),
             }
           : post,
+      ),
+    );
+  };
+  const handleSaveUnSave = (postId, saved) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId ? { ...post, savedByMe: saved } : post,
       ),
     );
   };
@@ -69,7 +75,8 @@ const ProfilePosts = ({ userId, currentUser }) => {
           key={post.id}
           post={post}
           currentUser={currentUser}
-          onLike={handleLike}
+          onLikeUnlike={handleLikeUnlike}
+          onSaveUnsave={handleSaveUnSave}
         />
       ))}
     </>

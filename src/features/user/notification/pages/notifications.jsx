@@ -16,7 +16,7 @@ import {
   markAllNotificationsReadService,
 } from "../services/notificationServices";
 
-import { subscribeToNotificationChanges } from "../services/notificationReatimeService";
+import { subscribeToNotificationChangesServices } from "../services/notificationReatimeService";
 
 const Notifications = () => {
   const navigate = useNavigate();
@@ -42,31 +42,34 @@ const Notifications = () => {
         setNotifications(data);
         setLoading(false);
 
-        channel = subscribeToNotificationChanges(user.id, async (payload) => {
-          const newNotification = payload.new;
+        channel = subscribeToNotificationChangesServices(
+          user.id,
+          async (payload) => {
+            const newNotification = payload.new;
 
-          console.log("Realtime notification:", newNotification);
+            console.log("Realtime notification:", newNotification);
 
-          try {
-            const notification = await getNotificationByIdService(
-              newNotification.id,
-            );
-
-            setNotifications((previousNotifications) => {
-              const alreadyExists = previousNotifications.some(
-                (item) => item.id === notification.id,
+            try {
+              const notification = await getNotificationByIdService(
+                newNotification.id,
               );
 
-              if (alreadyExists) {
-                return previousNotifications;
-              }
+              setNotifications((previousNotifications) => {
+                const alreadyExists = previousNotifications.some(
+                  (item) => item.id === notification.id,
+                );
 
-              return [notification, ...previousNotifications];
-            });
-          } catch (error) {
-            console.error("Error loading new notification:", error);
-          }
-        });
+                if (alreadyExists) {
+                  return previousNotifications;
+                }
+
+                return [notification, ...previousNotifications];
+              });
+            } catch (error) {
+              console.error("Error loading new notification:", error);
+            }
+          },
+        );
       } catch (error) {
         console.error("Error setting up notifications:", error);
         setLoading(false);

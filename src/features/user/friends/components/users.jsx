@@ -30,7 +30,7 @@ const AllUsers = ({
       sendingRequest.includes(receiverId) ||
      alreadySent
     ) {
-      return;
+      return;f
     }
 
     try {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MessageCircle, Check, X } from "react-feather";
 import { supabase } from "../../../../utils/supabase";
-import { useParams ,useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../../../components/layout/navbar";
 import {
   getProfileService,
@@ -23,6 +23,7 @@ import {
 import ChatSidebar from "../components/chatSidebar";
 import MessageList from "../components/messageList";
 import MessageInput from "../components/messageInput";
+import { getCurrentUserService } from "../../../auth/services/authServices";
 
 const ChatPage = () => {
   const { userId } = useParams();
@@ -44,16 +45,18 @@ const ChatPage = () => {
 
   const [unreadMessages, setUnreadMessages] = useState({});
 
-  useEffect(() => {
-    loadChatData();
-  }, []);
+  const clearConverstaion = () => {
+    setSelectedUser(null);
+    setMessages([]);
+    setRequest(null);
+  };
 
-  useEffect(() => {
-    if (!currentUser) {
-      return;
-    }
-    loadUnreadMessages();
-  }, [currentUser]);
+  const addChatToFriendIfNeeded = (user) => {
+    setFriends((prev) => {
+      const exists = prev.some((friend) => friend.id === user.id);
+      return exists ? prev : [...prev, user];
+    });
+  };
 
   const loadUnreadMessages = async () => {
     try {
@@ -86,11 +89,7 @@ const ChatPage = () => {
   const loadChatData = async () => {
     try {
       setLoading(true);
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+      const user= await getCurrentUserService()
       if (!user) {
         return;
       }
@@ -108,32 +107,37 @@ const ChatPage = () => {
     }
   };
 
+  useEffect(() => {
+    loadChatData();
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) {
+      return;
+    }
+    loadUnreadMessages();
+  }, [currentUser]);
+
   const handleSelectUser = async (user) => {
     try {
       if (user?.isAdmin) {
-        setSelectedUser(null);
-        setMessages([]);
-        setRequest(null);
+        clearConverstaion();
         return;
       }
       const blockedUserIds = await getBlockedUserIdsService(currentUser.id);
 
       if (blockedUserIds.includes(user.id)) {
-        setSelectedUser(null);
-        setMessages([]);
-        setRequest(null);
+        clearConverstaion();
         return;
       }
 
       setSelectedUser(user);
       setLoadingMessages(true);
 
-      const messagesData = await getMessagesService(currentUser.id, user.id);
-
-      const requestData = await getMessageRequestBetweenUsersService(
-        currentUser.id,
-        user.id,
-      );
+      const [messagesData, requestData] = Promise.all([
+        getMessagesService(currentUser.id, user.id),
+        getMessageRequestBetweenUsersService(currentUser.id, user.id),
+      ]);
 
       setMessages(messagesData);
       setRequest(requestData);
@@ -153,7 +157,6 @@ const ChatPage = () => {
       setLoadingMessages(false);
     }
   };
-
 
   useEffect(() => {
     if (!userId || !currentUser) {
@@ -198,25 +201,11 @@ const ChatPage = () => {
         text,
       );
 
-      setMessages((previous) => {
-        const exists = previous.some((message) => message.id === newMessage.id);
-
-        if (exists) {
-          return previous;
-        }
-
-        return [...previous, newMessage];
+      setMessages((prev) => {
+        const exists = prev.some((message) => message.id === newMessage.id);
+        return exists ? prev : [...prev, newMessage];
       });
-
-      setFriends((previous) => {
-        const exists = previous.some((friend) => friend.id === selectedUser.id);
-
-        if (exists) {
-          return previous;
-        }
-
-        return [...previous, selectedUser];
-      });
+      addChatToFriendIfNeeded(selectedUser);
     } catch (error) {
       console.error("Error sending message:", error);
 
@@ -240,15 +229,7 @@ const ChatPage = () => {
         previous.filter((item) => item.id !== request.id),
       );
 
-      setFriends((previous) => {
-        const exists = previous.some((friend) => friend.id === selectedUser.id);
-
-        if (exists) {
-          return previous;
-        }
-
-        return [...previous, selectedUser];
-      });
+      addChatToFriendIfNeeded(selectedUser);
     } catch (error) {
       console.error("Error accepting message request:", error);
     } finally {
@@ -316,15 +297,7 @@ const ChatPage = () => {
             return;
           }
 
-          setMessages((previous) => {
-            const exists = previous.some((item) => item.id === message.id);
-
-            if (exists) {
-              return previous;
-            }
-
-            return [...previous, message];
-          });
+          addChatToFriendIfNeeded(message);
         },
       )
       .subscribe();

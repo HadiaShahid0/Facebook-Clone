@@ -1,6 +1,6 @@
 import { supabase } from "../../../../utils/supabase";
 
-export const subscribeToNewPosts = (callback) => {
+export const subscribeToNewPostsServices = (callback) => {
   const channel = supabase
     .channel("post-realtime")
     .on(
@@ -19,7 +19,7 @@ export const subscribeToNewPosts = (callback) => {
   return channel;
 };
 
-export const subscribeToPostComments = (postId, callback) => {
+export const subscribeToPostCommentsServices = (postId, callback) => {
   const channel = supabase
     .channel(`post-comments-${postId}`)
     .on(
@@ -43,7 +43,7 @@ export const subscribeToPostComments = (postId, callback) => {
   return channel;
 };
 
-export const subscribeToPostLikes = (callback) => {
+export const subscribeToPostLikesServices = (callback) => {
   const channel = supabase.channel("post-likes-realtime");
 
   channel.on(

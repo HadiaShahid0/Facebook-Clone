@@ -5,7 +5,7 @@ import Navbar from "../../../../components/layout/navbar";
 import Sidebar from "../../../../components/layout/sidebar";
 import RightSidebar from "../../../../components/layout/rightSidebar";
 
-import PostCard from "../components/postCard";
+import PostCard from "./postCard";
 import { getSavedPostsService } from "../services/postServices";
 import { supabase } from "../../../../utils/supabase";
 
@@ -36,7 +36,7 @@ const SavedPosts = () => {
     loadSavedPosts();
   }, []);
 
-  const handleSave = (postId, saved) => {
+  const handleSaveUnsave = (postId, saved) => {
     if (!saved) {
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
     }
@@ -128,7 +128,7 @@ const SavedPosts = () => {
                     key={post.id}
                     post={post}
                     currentUser={currentUser}
-                    onSave={handleSave}
+                    onSaveUnsave={handleSaveUnsave}
                   />
                 ))}
             </div>

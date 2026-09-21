@@ -11,7 +11,7 @@ import Profile from "../features/user/profile/pages/profile";
 import Notifications from "../features/user/notification/pages/notifications";
 import Chat from "../features/user/chat/pages/chatPage";
 import Post from "../features/user/post/components/singlePost";
-import SavedPosts from "../features/user/post/components/savePost";
+import SavedPosts from "../features/user/post/components/savedPost";
 import BlockedUser from "../features/user/profile/components/blockedUser";
 import AccountUnderReview from "../components/common/accountUnderReview";
 

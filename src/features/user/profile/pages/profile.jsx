@@ -46,7 +46,6 @@ const Profile = () => {
       setFriendStatus("none");
       setFriendRequestId(null);
     };
-
     try {
       setLoading(true);
 

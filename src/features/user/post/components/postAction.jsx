@@ -4,11 +4,17 @@ import { ThumbsUp, MessageCircle, Share2, Bookmark } from "react-feather";
 import {
   likePostService,
   unlikePostService,
-  savePostService,
-  unsavePostService,
+  savedPostService,
+  unsavedPostService,
 } from "../services/postServices";
 
-const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
+const PostActions = ({
+  post,
+  currentUser,
+  onLikeUnlike,
+  onSaveUnsave,
+  onCommentClick,
+}) => {
   const [loading, setLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [toast, setToast] = useState(null);
@@ -21,7 +27,7 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
     }, 3000);
   };
 
-  const handleLike = async () => {
+  const handleLikeUnlike = async () => {
     if (loading) {
       return;
     }
@@ -31,10 +37,10 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
 
       if (post.likedByMe) {
         await unlikePostService(post.id, currentUser.id);
-        onLike(post.id, false);
+        onLikeUnlike(post.id, false);
       } else {
         await likePostService(post.id, currentUser.id);
-        onLike(post.id, true);
+        onLikeUnlike(post.id, true);
       }
     } catch (error) {
       console.error("Error updating like:", error);
@@ -44,7 +50,8 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSaveUnsave = async () => {
+    //handle SaveUnsave
     if (saveLoading) {
       return;
     }
@@ -53,12 +60,13 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
       setSaveLoading(true);
 
       if (post.savedByMe) {
-        await unsavePostService(post.id, currentUser.id);
-        onSave(post.id, false);
+        await unsavedPostService(post.id, currentUser.id);
+        onSaveUnsave(post.id, false); //onSaveUnsaveUnSave
+        console.log("onsaveUnsave check", onSaveUnsave);
         showToast("Post removed from saved posts.");
       } else {
-        await savePostService(post.id, currentUser.id);
-        onSave(post.id, true);
+        await savedPostService(post.id, currentUser.id);
+        onSaveUnsave(post.id, true);
         showToast("Post saved successfully.");
       }
     } catch (error) {
@@ -101,7 +109,7 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
           className={`btn flex-grow-1 ${
             post.likedByMe ? "text-primary" : "text-secondary"
           }`}
-          onClick={handleLike}
+          onClick={handleLikeUnlike}
           disabled={loading}
         >
           <ThumbsUp
@@ -135,7 +143,7 @@ const PostActions = ({ post, currentUser, onLike, onSave, onCommentClick }) => {
           className={`btn flex-grow-1 ${
             post.savedByMe ? "text-primary" : "text-secondary"
           }`}
-          onClick={handleSave}
+          onClick={handleSaveUnsave}
           disabled={saveLoading}
         >
           <Bookmark
