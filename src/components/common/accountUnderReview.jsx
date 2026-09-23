@@ -13,11 +13,7 @@ const AccountUnderReview = () => {
   const [timeLeft, setTimeLeft] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const {
-    suspensionType,
-    suspensionReason,
-    suspendedUntil,
-  } = suspension;
+  const { suspensionType, suspensionReason, suspendedUntil } = suspension;
 
   const isTemporary = suspensionType === "temporary";
   const isPermanent = suspensionType === "permanent";
@@ -35,9 +31,7 @@ const AccountUnderReview = () => {
 
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select(
-          "isSuspended, suspensionType, suspensionReason, suspendedUntil",
-        )
+        .select("isSuspended, suspensionType, suspensionReason, suspendedUntil")
         .eq("id", user.id)
         .single();
 
@@ -113,8 +107,7 @@ const AccountUnderReview = () => {
     let restoring = false;
 
     const updateTimer = async () => {
-      const difference =
-        new Date(suspendedUntil).getTime() - Date.now();
+      const difference = new Date(suspendedUntil).getTime() - Date.now();
 
       if (difference <= 0) {
         setTimeLeft("Suspension period has ended.");
@@ -153,21 +146,13 @@ const AccountUnderReview = () => {
         return;
       }
 
-      const days = Math.floor(
-        difference / (1000 * 60 * 60 * 24),
-      );
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
 
-      const hours = Math.floor(
-        (difference / (1000 * 60 * 60)) % 24,
-      );
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
 
-      const minutes = Math.floor(
-        (difference / (1000 * 60)) % 60,
-      );
+      const minutes = Math.floor((difference / (1000 * 60)) % 60);
 
-      const seconds = Math.floor(
-        (difference / 1000) % 60,
-      );
+      const seconds = Math.floor((difference / 1000) % 60);
 
       setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
     };
@@ -229,17 +214,12 @@ const AccountUnderReview = () => {
         {/* Timer */}
         {isTemporary && suspendedUntil && (
           <div className="alert alert-warning border rounded-3 mb-3">
-            <div className="fw-semibold mb-2">
-              Time Remaining
-            </div>
+            <div className="fw-semibold mb-2">Time Remaining</div>
 
-            <h4 className="fw-bold mb-2">
-              {timeLeft}
-            </h4>
+            <h4 className="fw-bold mb-2">{timeLeft}</h4>
 
             <small className="text-muted">
-              Suspended until{" "}
-              {new Date(suspendedUntil).toLocaleString()}
+              Suspended until {new Date(suspendedUntil).toLocaleString()}
             </small>
           </div>
         )}
@@ -247,9 +227,7 @@ const AccountUnderReview = () => {
         {/* Admin Reason */}
         {suspensionReason && (
           <div className="alert alert-light border rounded-3 text-start">
-            <small className="text-muted d-block mb-1">
-              Admin Reason
-            </small>
+            <small className="text-muted d-block mb-1">Admin Reason</small>
 
             <span>{suspensionReason}</span>
           </div>

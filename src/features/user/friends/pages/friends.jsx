@@ -41,7 +41,7 @@ const Friends = () => {
     return allUsers.filter(
       (user) =>
         !blockedUserIds.includes(user.id) && !user.isAdmin && !user.isSuspended,
-    );
+    );                    
   };
 
   const loadFriends = async () => {

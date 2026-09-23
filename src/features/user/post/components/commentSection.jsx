@@ -174,6 +174,7 @@ const CommentSection = ({
             type="submit"
             className="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
             disabled={submitting || !comment.trim()}
+             aria-label="Post comment"
             style={{
               width: "40px",
               height: "40px",

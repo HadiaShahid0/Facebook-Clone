@@ -29,17 +29,17 @@ const Login = () => {
       const data = await loginService(formData.email, formData.password);
 
       if (data.isSuspended) {
-        navigate("/account-under-review",{
-          state:{
+        navigate("/account-under-review", {
+          state: {
             suspensionType: data.suspensionType,
             suspensionReason: data.suspensionReason,
-            suspendedUntil: data.suspendedUntil
-          }
+            suspendedUntil: data.suspendedUntil,
+          },
         });
         return;
       }
-      if(data.isAdmin){
-        navigate("/admin")
+      if (data.isAdmin) {
+        navigate("/admin");
         return;
       }
       navigate("/");
@@ -59,10 +59,13 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Email</label>
+            <label className="form-label" htmlFor="email">
+              Email
+            </label>
 
             <input
               type="email"
+              id="email"
               name="email"
               className="form-control"
               value={formData.email}
@@ -72,10 +75,13 @@ const Login = () => {
           </div>
 
           <div className="mb-3">
-            <label className="form-label">Password</label>
+            <label className="form-label" htmlFor="password">
+              Password
+            </label>
 
             <input
               type="password"
+              id="password"
               name="password"
               className="form-control"
               value={formData.password}
@@ -84,7 +90,11 @@ const Login = () => {
             />
           </div>
 
-          <button className="btn btn-primary w-100" disabled={loading}>
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
