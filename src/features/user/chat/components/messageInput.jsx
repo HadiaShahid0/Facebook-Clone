@@ -27,7 +27,7 @@ const MessageInput = ({ onSend }) => {
           onChange={(e) => setText(e.target.value)}
         />
 
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" aria-label="Send Message">
           <Send size={17} />
         </button>
       </div>

@@ -159,6 +159,7 @@ const Comment = ({
               className="form-control form-control-sm rounded-pill pe-5"
               contentEditable={!submitting}
               suppressContentEditableWarning
+              aria-label={`Reply to ${username}`}
               onInput={handleReplyChange}
               style={{
                 minHeight: "31px",
@@ -167,7 +168,6 @@ const Comment = ({
             >
               <span className="text-primary">@{username}</span>{" "}
             </div>
-
             <button
               type="button"
               className="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-1 p-1 text-secondary"

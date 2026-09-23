@@ -288,6 +288,7 @@ const ProfileHeader = ({
                 <button
                   className="btn btn-light rounded-circle"
                   data-bs-toggle="dropdown"
+                  aria-label="More Options"
                 >
                   <MoreHorizontal size={20} />
                 </button>

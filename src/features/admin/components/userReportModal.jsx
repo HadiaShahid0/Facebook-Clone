@@ -72,9 +72,11 @@ const UserReportModal = ({ user, onClose, onAction }) => {
         backgroundColor: "rgba(0, 0, 0, 0.5)",
       }}
     >
-      <div className="modal-dialog modal-lg modal-dialog-scrollable">
+      <div
+        className="modal-dialog modal-lg modal-dialog-scrollable"
+        aria-label="Action Modal"
+      >
         <div className="modal-content border-0 rounded-4">
-
           {/* Header */}
           <div className="modal-header">
             <div>
@@ -82,15 +84,10 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                 Reports for {reportedUser?.username}
               </h5>
 
-              <small className="text-muted">
-                Total Reports: {user.count}
-              </small>
+              <small className="text-muted">Total Reports: {user.count}</small>
             </div>
 
-            <button
-              className="btn btn-light rounded-circle"
-              onClick={onClose}
-            >
+            <button className="btn btn-light rounded-circle" onClick={onClose}>
               <X size={18} />
             </button>
           </div>
@@ -114,9 +111,7 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                     />
 
                     <div>
-                      <small className="text-muted d-block">
-                        Reported by
-                      </small>
+                      <small className="text-muted d-block">Reported by</small>
 
                       <span className="fw-semibold">
                         {report.reporter?.username || "Unknown"}
@@ -124,36 +119,24 @@ const UserReportModal = ({ user, onClose, onAction }) => {
                     </div>
                   </div>
 
-                  <small className="text-muted">
-                    Report #{index + 1}
-                  </small>
+                  <small className="text-muted">Report #{index + 1}</small>
                 </div>
 
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <small className="text-muted d-block">
-                      Category
-                    </small>
+                    <small className="text-muted d-block">Category</small>
 
-                    <span className="fw-semibold">
-                      {report.category}
-                    </span>
+                    <span className="fw-semibold">{report.category}</span>
                   </div>
 
                   <div className="col-md-6">
-                    <small className="text-muted d-block">
-                      Reason
-                    </small>
+                    <small className="text-muted d-block">Reason</small>
 
-                    <span className="fw-semibold">
-                      {report.reason}
-                    </span>
+                    <span className="fw-semibold">{report.reason}</span>
                   </div>
 
                   <div className="col-12">
-                    <small className="text-muted d-block">
-                      Description
-                    </small>
+                    <small className="text-muted d-block">Description</small>
 
                     <p className="mb-0">
                       {report.description || "No description provided."}
@@ -162,8 +145,7 @@ const UserReportModal = ({ user, onClose, onAction }) => {
 
                   <div className="col-12">
                     <small className="text-muted">
-                      Reported on{" "}
-                      {new Date(report.created_at).toLocaleString()}
+                      Reported on {new Date(report.created_at).toLocaleString()}
                     </small>
                   </div>
                 </div>
@@ -172,9 +154,7 @@ const UserReportModal = ({ user, onClose, onAction }) => {
 
             {/* Moderation */}
             <div className="border-top pt-4 mt-4">
-              <h6 className="fw-bold mb-3">
-                Moderation Action
-              </h6>
+              <h6 className="fw-bold mb-3">Moderation Action</h6>
 
               {!hasPendingReport ? (
                 <div className="alert alert-light border mb-0">
@@ -187,38 +167,29 @@ const UserReportModal = ({ user, onClose, onAction }) => {
               ) : (
                 <>
                   <div className="mb-3">
-                    <label className="form-label">
+                    <label htmlFor="action" className="form-label">
                       Action
                     </label>
 
                     <select
                       className="form-select"
                       value={action}
+                      id="action"
                       onChange={(e) => setAction(e.target.value)}
                     >
-                      <option value="">
-                        Select action
-                      </option>
+                      <option value="">Select action</option>
 
-                      <option value="dismiss">
-                        Dismiss Reports
-                      </option>
+                      <option value="dismiss">Dismiss Reports</option>
 
-                      <option value="temporary">
-                        Temporary Suspend
-                      </option>
+                      <option value="temporary">Temporary Suspend</option>
 
-                      <option value="permanent">
-                        Permanent Suspend
-                      </option>
+                      <option value="permanent">Permanent Suspend</option>
                     </select>
                   </div>
 
                   {action === "temporary" && (
                     <div className="mb-3">
-                      <label className="form-label">
-                        Suspension Duration
-                      </label>
+                      <label className="form-label">Suspension Duration</label>
 
                       <select
                         className="form-select"
@@ -236,9 +207,7 @@ const UserReportModal = ({ user, onClose, onAction }) => {
 
                   {action && (
                     <div className="mb-3">
-                      <label className="form-label">
-                        Admin Reason
-                      </label>
+                      <label className="form-label">Admin Reason</label>
 
                       <textarea
                         className="form-control"
@@ -267,9 +236,7 @@ const UserReportModal = ({ user, onClose, onAction }) => {
             {hasPendingReport && action && (
               <button
                 className={`btn ${
-                  action === "dismiss"
-                    ? "btn-warning"
-                    : "btn-danger"
+                  action === "dismiss" ? "btn-warning" : "btn-danger"
                 }`}
                 onClick={handleAction}
                 disabled={loading}
@@ -284,7 +251,6 @@ const UserReportModal = ({ user, onClose, onAction }) => {
               </button>
             )}
           </div>
-
         </div>
       </div>
     </div>

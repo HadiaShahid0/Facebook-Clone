@@ -47,10 +47,13 @@ const Signup = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Username</label>
+            <label className="form-label" htmlFor="username">
+              Username
+            </label>
 
             <input
               type="text"
+              id="username"
               name="username"
               className="form-control"
               value={formData.username}
@@ -60,10 +63,13 @@ const Signup = () => {
           </div>
 
           <div className="mb-3">
-            <label className="form-label">Email</label>
+            <label className="form-label" htmlFor="email">
+              Email
+            </label>
 
             <input
               type="email"
+              id="email"
               name="email"
               className="form-control"
               value={formData.email}
@@ -73,10 +79,13 @@ const Signup = () => {
           </div>
 
           <div className="mb-3">
-            <label className="form-label">Password</label>
+            <label className="form-label" htmlFor="password">
+              Password
+            </label>
 
             <input
               type="password"
+              id="password"
               name="password"
               className="form-control"
               value={formData.password}

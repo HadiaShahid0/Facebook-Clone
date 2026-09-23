@@ -89,7 +89,7 @@ const ChatPage = () => {
   const loadChatData = async () => {
     try {
       setLoading(true);
-      const user= await getCurrentUserService()
+      const user = await getCurrentUserService();
       if (!user) {
         return;
       }
@@ -134,11 +134,10 @@ const ChatPage = () => {
       setSelectedUser(user);
       setLoadingMessages(true);
 
-      const [messagesData, requestData] = Promise.all([
+      const [messagesData, requestData] = await Promise.all([
         getMessagesService(currentUser.id, user.id),
         getMessageRequestBetweenUsersService(currentUser.id, user.id),
       ]);
-
       setMessages(messagesData);
       setRequest(requestData);
 
